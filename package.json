@@ -1,21 +1,24 @@
 {
-  "name": "storm-component-boilerplate",
-  "version": "1.2.0",
+  "name": "storm-slides",
+  "version": "0.1.0",
   "description": "",
   "author": "stormid",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mjbp/storm-component-boilerplate.git"
+    "url": "https://github.com/mjbp/storm-slides.git"
   },
   "bugs": {
-    "url": "https://github.com/mjbp/storm-component-boilerplate/issues"
+    "url": "https://github.com/mjbp/storm-slides/issues"
   },
   "main": "dist/index.js",
-  "browser": "dist/storm-component-boilerplate.standalone.js",
+  "browser": "dist/storm-slides.standalone.js",
   "keywords": [
     "stormid",
-    "boilerplate",
+    "slides",
+    "carousel",
+    "fader",
+    "slider",
     "component"
   ],
   "scripts": {

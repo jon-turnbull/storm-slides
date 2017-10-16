@@ -1,9 +1,10 @@
 # Storm Slides
 
 [![Build Status](https://travis-ci.org/mjbp/storm-slides.svg?branch=master)](https://travis-ci.org/mjbp/storm-slides)
-[![codecov.io](http://codecov.io/github/mjbp/storm-slides/coverage.svg?branch=master)](http://codecov.io/github/mjbp/storm-cslides?branch=master)
+[![codecov.io](http://codecov.io/github/mjbp/storm-slides/coverage.svg?branch=master)](http://codecov.io/github/mjbp/storm-slides?branch=master)
 [![npm version](https://badge.fury.io/js/storm-slides.svg)](https://badge.fury.io/js/storm-slides)
 
+Accessible image lazyloading slides/carousel/fader component.
 
 ## Example
 [https://mjbp.github.io/storm-slides](https://mjbp.github.io/storm-slides)
@@ -14,22 +15,27 @@ HTML
 <div class="js-slides">
     <div class="js-slides__list">
         <div class="js-slides__item">
-            <img src="http://lorempixel.com/400/200">
+            <img data-src="http://lorempixel.com/400/200">
         </div>
         <div class="js-slides__item">
-            <img src="http://lorempixel.com/400/200">
+            <img data-src="http://lorempixel.com/400/200">
         </div>
         <div class="js-slides__item">
-            <img src="http://lorempixel.com/400/200">
+            <img data-src="http://lorempixel.com/400/200">
         </div>
         <div class="js-slides__item">
-            <img src="http://lorempixel.com/400/200">
+            <img data-src="http://lorempixel.com/400/200">
         </div>
-      </div>
-
-      <button class="js-slides__previous">Previous</button>
-      <button class="js-slides__previous">Next</button>
     </div>
+    <button class="js-slides__previous">Previous</button>
+    <button class="js-slides__next">Next</button>
+    <ul>
+        <li><button class="js-slides__nav-item">1</button></li>
+        <li><button class="js-slides__nav-item">2</button></li>
+        <li><button class="js-slides__nav-item">3</button></li>
+        <li><button class="js-slides__nav-item">4</button><li>
+    </ul>
+    <div aria-live="polite" aria-atomic="true" class="visuallyhidden js-slides__liveregion"></div>
 </div>
 ```
 

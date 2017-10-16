@@ -1,4 +1,13 @@
-
+.visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
 .js-slides {
     position: relative;
 }
@@ -13,7 +22,7 @@
     left: 0;
     width: 100%;
 }
-.js-slides__item.is--active {
+.js-slides__item.is--current {
     visibility: visible;
     position: relative;
 }
@@ -26,7 +35,6 @@
   -ms-animation: fadeOut 450ms cubic-bezier(0.455, 0.03, 0.515, 0.955) both;
   animation: fadeOut 450ms cubic-bezier(0.455, 0.03, 0.515, 0.955) both;
 }
-
 
 @-webkit-keyframes fadeOut {
   100% {

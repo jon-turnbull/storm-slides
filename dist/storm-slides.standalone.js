@@ -1,6 +1,6 @@
 /**
- * @name storm-component-boilerplate: 
- * @version 1.2.0: Mon, 16 Oct 2017 16:25:34 GMT
+ * @name storm-slides: 
+ * @version 0.1.0: Mon, 16 Oct 2017 20:30:37 GMT
  * @author stormid
  * @license MIT
  */
@@ -28,7 +28,9 @@ var defaults = {
 	buttonNextSelector: '.js-slides__next',
 	navItemSelector: '.js-slides__nav-item',
 	itemSelector: '.js-slides__item',
-	activeClass: 'is--active',
+	liveRegionSelector: '.js-slides__liveregion',
+	loadingClass: 'is--loading',
+	activeClass: 'is--current',
 	showPreviousClass: 'show--previous',
 	showNextClass: 'show--next',
 	hidePreviousClass: 'hide--previous',
@@ -47,18 +49,23 @@ var componentPrototype = {
 	init: function init() {
 		var _this = this;
 
-		this.items = [].slice.call(document.querySelectorAll(this.settings.itemSelector));
-		this.imageCache = [];
+		this.slides = [].slice.call(document.querySelectorAll(this.settings.itemSelector)).map(function (slide) {
+			return {
+				unloadedImgs: [].slice.call(slide.querySelectorAll('[data-srcset], [data-src]')),
+				container: slide
+			};
+		});
+
 		this.nextButton = document.querySelector(this.settings.buttonNextSelector);
 		this.previousButton = document.querySelector(this.settings.buttonPreviousSelector);
 		this.navItems = [].slice.call(document.querySelectorAll(this.settings.navItemSelector));
-		this.currentIndex = this.settings.startIndex;
+		this.notification = this.node.querySelector(this.settings.liveRegionSelector);
+		this.setCurrent(this.settings.startIndex);
+		this.slides[this.currentIndex].container.classList.add(this.settings.activeClass);
 		this.initHandlers();
-		this.items[this.currentIndex].classList.add(this.settings.activeClass);
-
-		this.settings.preload ? this.items.forEach(function (item, i) {
+		this.settings.preload ? this.slides.forEach(function (slide, i) {
 			_this.loadImage(i);
-		}) : this.loadImages(this.currentIndex);
+		}) : this.loadImages(this.settings.startIndex);
 
 		return this;
 	},
@@ -80,45 +87,35 @@ var componentPrototype = {
 			});
 		});
 	},
-	loadImage: function loadImage(i) {
+	loadImages: function loadImages(i) {
 		var _this3 = this;
 
-		var img = new Image(),
-		    loaded = function loaded() {
-			/*
-   let srcsetAttribute = this.items[i].srcset ? ` srcset="${this.items[i].srcset}"` : '',
-   	sizesAttribute = this.items[i].sizes ? ` sizes="${this.items[i].sizes}"` : '';
-   imageContainer.innerHTML = `<img class="${imageClassName}" src="${this.items[i].src}" alt="${this.items[i].title}"${srcsetAttribute}${sizesAttribute}>`;
-   this.items[i].classList.remove('is--loading');
-   img.onload = null;
-   */
-		};
-		img.onload = loaded;
-		img.src = this.items[i].src;
-		img.onerror = function () {
-			_this3.items[i].classList.remove('is--loading');
-			_this3.items[i].classList.add('has--error');
-		};
-	},
-	loadImages: function loadImages(i) {
-		var _this4 = this;
-
-		if (this.imageCache.length === this.items) return;
-
+		if (!this.node.querySelector('[data-src], [data-srcset]')) return;
 		var indexes = [i];
 
-		if (this.items.length > 1) indexes.push(i === 0 ? this.items.length - 1 : i - 1);
-		if (this.items.length > 2) indexes.push(i === this.items.length - 1 ? 0 : i + 1);
+		if (this.slides.length > 1) indexes.push(i === 0 ? this.slides.length - 1 : i - 1);
+		if (this.slides.length > 2) indexes.push(i === this.slides.length - 1 ? 0 : i + 1);
 
 		indexes.forEach(function (idx) {
-			if (_this4.imageCache[idx] === undefined) {
-				_this4.items[idx].classList.add('loading');
-				_this4.loadImage(idx);
-			}
+			if (!_this3.slides[idx].unloadedImgs.length) return;
+
+			_this3.slides[idx].container.classList.add(_this3.settings.loadingClass);
+			_this3.slides[idx].unloadedImgs = _this3.slides[idx].unloadedImgs.reduce(function (acc, el) {
+				['src', 'srcset'].forEach(function (type) {
+					if (el.hasAttribute('data-' + type)) {
+						el.setAttribute(type, el.getAttribute('data-' + type));
+						el.removeAttribute('data-' + type);
+					}
+					_this3.slides[idx].container.classList.remove(_this3.settings.loadingClass);
+				});
+				return acc;
+			}, []);
 		});
 	},
 	reset: function reset() {
-		this.items[this.currentIndex].classList.remove(this.settings.activeClass);
+		this.slides[this.currentIndex].container.classList.remove(this.settings.activeClass);
+		this.slides[this.currentIndex].container.removeAttribute('tabindex');
+		this.navItems.length && this.navItems[this.currentIndex].removeAttribute('aria-current');
 
 		var previouslyHidden = this.node.querySelector('.' + this.settings.hidePreviousClass),
 		    previouslyShown = this.node.querySelector('.' + this.settings.showPreviousClass),
@@ -131,29 +128,33 @@ var componentPrototype = {
 		nextHidden && nextHidden.classList.remove(this.settings.hideNextClass);
 	},
 	next: function next() {
-		this.change(this.currentIndex === this.items.length - 1 ? 0 : this.currentIndex + 1);
+		this.change(this.currentIndex === this.slides.length - 1 ? 0 : this.currentIndex + 1);
 	},
 	previous: function previous() {
-		this.change(this.currentIndex === 0 ? this.items.length - 1 : this.currentIndex - 1);
+		this.change(this.currentIndex === 0 ? this.slides.length - 1 : this.currentIndex - 1);
 	},
 	change: function change(index) {
 		if (index === this.currentIndex) return;
 
+		this.reset();
 		this.loadImages(index);
 
-		this.reset();
+		index = index === -1 ? this.slides.length - 1 : index === this.slides.length ? 0 : index;
+		var isForwards = (index > this.currentIndex || index === 0 && this.currentIndex === this.slides.length - 1) && !(index === this.slides.length - 1 && this.currentIndex === 0);
 
-		index = index === -1 ? this.items.length - 1 : index === this.items.length ? 0 : index;
-
-		var isForwards = (index > this.currentIndex || index === 0 && this.currentIndex === this.items.length - 1) && !(index === this.items.length - 1 && this.currentIndex === 0);
-
-		this.items[this.currentIndex].classList.add(isForwards ? this.settings.hidePreviousClass : this.settings.hideNextClass);
-		this.items[index].classList.add(this.settings.activeClass);
-		this.items[index].classList.add('' + (isForwards ? this.settings.showNextClass : this.settings.showPreviousClass));
-
-		this.currentIndex = index;
+		this.slides[this.currentIndex].container.classList.add(isForwards ? this.settings.hidePreviousClass : this.settings.hideNextClass);
+		this.slides[index].container.classList.add('' + (isForwards ? this.settings.showNextClass : this.settings.showPreviousClass));
+		this.setCurrent(index);
 
 		this.settings.callback && typeof this.settings.callback === 'function' && this.settings.callback();
+	},
+	setCurrent: function setCurrent(i) {
+		this.slides[i].container.classList.add(this.settings.activeClass);
+		this.slides[i].container.setAttribute('tabindex', '-1');
+		this.slides[i].container.focus();
+		this.navItems.length && this.navItems[i].setAttribute('aria-current', true);
+		this.notification.innerHTML = 'Slide ' + (i + 1) + ' of ' + this.slides.length;
+		this.currentIndex = i;
 	}
 };
 

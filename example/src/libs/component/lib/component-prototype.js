@@ -5,16 +5,20 @@ const KEY_CODES = {
 
 export default {
 	init(){
-		this.items = [].slice.call(document.querySelectorAll(this.settings.itemSelector));
-		this.imageCache = [];
+		this.slides = [].slice.call(document.querySelectorAll(this.settings.itemSelector))
+						.map(slide => ({
+							unloadedImgs: [].slice.call(slide.querySelectorAll('[data-srcset], [data-src]')),
+							container: slide
+						}));
+
 		this.nextButton = document.querySelector(this.settings.buttonNextSelector);
 		this.previousButton = document.querySelector(this.settings.buttonPreviousSelector);
 		this.navItems = [].slice.call(document.querySelectorAll(this.settings.navItemSelector));
-		this.currentIndex = this.settings.startIndex;
+		this.notification = this.node.querySelector(this.settings.liveRegionSelector);
+		this.setCurrent(this.settings.startIndex);
+		this.slides[this.currentIndex].container.classList.add(this.settings.activeClass);
 		this.initHandlers();
-		this.items[this.currentIndex].classList.add(this.settings.activeClass);
-		
-		this.settings.preload ? this.items.forEach((item, i) => { this.loadImage(i); }) : this.loadImages(this.currentIndex);
+		this.settings.preload ? this.slides.forEach((slide, i) => { this.loadImage(i); }) : this.loadImages(this.settings.startIndex);
 
 		return this;
 	},
@@ -34,42 +38,33 @@ export default {
 			});
 		});
 	},
-	loadImage(i) {
-		let img = new Image(),
-			loaded = () => {
-				/*
-				let srcsetAttribute = this.items[i].srcset ? ` srcset="${this.items[i].srcset}"` : '',
-					sizesAttribute = this.items[i].sizes ? ` sizes="${this.items[i].sizes}"` : '';
-				imageContainer.innerHTML = `<img class="${imageClassName}" src="${this.items[i].src}" alt="${this.items[i].title}"${srcsetAttribute}${sizesAttribute}>`;
-				this.items[i].classList.remove('is--loading');
-				img.onload = null;
-				*/
-			};
-		img.onload = loaded;
-		img.src = this.items[i].src;
-		img.onerror = () => {
-			this.items[i].classList.remove('is--loading');
-			this.items[i].classList.add('has--error');
-		};
-		if(img.complete) loaded();
-	},
 	loadImages(i){
-		if(this.imageCache.length === this.items) return;
-
+		if(!this.node.querySelector('[data-src], [data-srcset]')) return;
 		let indexes = [i];
 
-		if(this.items.length > 1) indexes.push(i === 0 ? this.items.length - 1 : i - 1);
-		if(this.items.length > 2) indexes.push(i === this.items.length - 1 ? 0 : i + 1);
+		if(this.slides.length > 1) indexes.push(i === 0 ? this.slides.length - 1 : i - 1);
+		if(this.slides.length > 2) indexes.push(i === this.slides.length - 1 ? 0 : i + 1);
 
 		indexes.forEach(idx => {
-			if(this.imageCache[idx] === undefined) {
-				this.items[idx].classList.add('loading');
-				this.loadImage(idx);
-			}
+			if(!this.slides[idx].unloadedImgs.length) return;
+
+			this.slides[idx].container.classList.add(this.settings.loadingClass);
+			this.slides[idx].unloadedImgs = this.slides[idx].unloadedImgs.reduce((acc, el) => {
+				['src', 'srcset'].forEach(type => {
+					if(el.hasAttribute(`data-${type}`)) {
+						el.setAttribute(type, el.getAttribute(`data-${type}`));
+						el.removeAttribute(`data-${type}`);
+					}
+					this.slides[idx].container.classList.remove(this.settings.loadingClass);
+				});
+				return acc;
+			}, []);
 		});
 	},
 	reset(){
-		this.items[this.currentIndex].classList.remove(this.settings.activeClass);
+		this.slides[this.currentIndex].container.classList.remove(this.settings.activeClass);
+		this.slides[this.currentIndex].container.removeAttribute('tabindex');
+		this.navItems.length && this.navItems[this.currentIndex].removeAttribute('aria-current');
 
 		let previouslyHidden = this.node.querySelector(`.${this.settings.hidePreviousClass}`),
 			previouslyShown = this.node.querySelector(`.${this.settings.showPreviousClass}`),
@@ -82,28 +77,32 @@ export default {
 		nextHidden && nextHidden.classList.remove(this.settings.hideNextClass);
 	},
 	next(){
-		this.change((this.currentIndex === this.items.length - 1 ? 0 : this.currentIndex + 1));
+		this.change((this.currentIndex === this.slides.length - 1 ? 0 : this.currentIndex + 1));
 	},
 	previous(){
-		this.change((this.currentIndex === 0 ? this.items.length - 1 : this.currentIndex - 1));
+		this.change((this.currentIndex === 0 ? this.slides.length - 1 : this.currentIndex - 1));
 	},
 	change(index){
 		if (index === this.currentIndex) return;
-
+		
+		this.reset();
 		this.loadImages(index);
 
-		this.reset();
-
-		index = index === -1 ? this.items.length - 1 : index === this.items.length ? 0 : index;
+		index = index === -1 ? this.slides.length - 1 : index === this.slides.length ? 0 : index;
+		let isForwards = (index > this.currentIndex || index === 0 && this.currentIndex === this.slides.length - 1) && !(index === (this.slides.length - 1) && this.currentIndex === 0);
 		
-		let isForwards = (index > this.currentIndex || index === 0 && this.currentIndex === this.items.length - 1) && !(index === (this.items.length - 1) && this.currentIndex === 0);
-
-		this.items[this.currentIndex].classList.add(isForwards ? this.settings.hidePreviousClass : this.settings.hideNextClass);
-		this.items[index].classList.add(this.settings.activeClass);
-		this.items[index].classList.add(`${isForwards ? this.settings.showNextClass : this.settings.showPreviousClass}`);
+		this.slides[this.currentIndex].container.classList.add(isForwards ? this.settings.hidePreviousClass : this.settings.hideNextClass);
+		this.slides[index].container.classList.add(`${isForwards ? this.settings.showNextClass : this.settings.showPreviousClass}`);
+		this.setCurrent(index);
 		
-		this.currentIndex = index;
-	
 		(this.settings.callback && typeof this.settings.callback === 'function') && this.settings.callback();
+	},
+	setCurrent(i){
+		this.slides[i].container.classList.add(this.settings.activeClass);
+		this.slides[i].container.setAttribute('tabindex', '-1');
+		this.slides[i].container.focus();
+		this.navItems.length && this.navItems[i].setAttribute('aria-current', true);
+		this.notification.innerHTML = `Slide ${i + 1} of ${this.slides.length}`;
+		this.currentIndex = i;
 	}
 };

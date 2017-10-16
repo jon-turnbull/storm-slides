@@ -1,6 +1,6 @@
 /**
- * @name storm-component-boilerplate: 
- * @version 1.2.0: Mon, 16 Oct 2017 16:25:34 GMT
+ * @name storm-slides: 
+ * @version 0.1.0: Mon, 16 Oct 2017 20:30:37 GMT
  * @author stormid
  * @license MIT
  */

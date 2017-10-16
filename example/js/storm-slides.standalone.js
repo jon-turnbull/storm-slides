@@ -1,6 +1,6 @@
 /**
- * @name storm-component-boilerplate: 
- * @version 1.2.0: Mon, 16 Oct 2017 20:29:06 GMT
+ * @name storm-slides: 
+ * @version 0.1.0: Mon, 16 Oct 2017 20:30:37 GMT
  * @author stormid
  * @license MIT
  */
@@ -143,13 +143,13 @@ var componentPrototype = {
 		var isForwards = (index > this.currentIndex || index === 0 && this.currentIndex === this.slides.length - 1) && !(index === this.slides.length - 1 && this.currentIndex === 0);
 
 		this.slides[this.currentIndex].container.classList.add(isForwards ? this.settings.hidePreviousClass : this.settings.hideNextClass);
-		this.slides[index].container.classList.add(this.settings.activeClass);
 		this.slides[index].container.classList.add('' + (isForwards ? this.settings.showNextClass : this.settings.showPreviousClass));
 		this.setCurrent(index);
 
 		this.settings.callback && typeof this.settings.callback === 'function' && this.settings.callback();
 	},
 	setCurrent: function setCurrent(i) {
+		this.slides[i].container.classList.add(this.settings.activeClass);
 		this.slides[i].container.setAttribute('tabindex', '-1');
 		this.slides[i].container.focus();
 		this.navItems.length && this.navItems[i].setAttribute('aria-current', true);
