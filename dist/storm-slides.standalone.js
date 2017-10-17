@@ -1,6 +1,6 @@
 /**
- * @name storm-slides: 
- * @version 0.1.0: Mon, 16 Oct 2017 20:30:37 GMT
+ * @name storm-slides: Slides/carousel/fader/slider component
+ * @version 0.1.0: Tue, 17 Oct 2017 12:40:44 GMT
  * @author stormid
  * @license MIT
  */
@@ -59,6 +59,9 @@ var componentPrototype = {
 		this.nextButton = document.querySelector(this.settings.buttonNextSelector);
 		this.previousButton = document.querySelector(this.settings.buttonPreviousSelector);
 		this.navItems = [].slice.call(document.querySelectorAll(this.settings.navItemSelector));
+
+		if (this.navItems.length > 0 && this.navItems.length !== this.slides.length) throw new Error('Slide navigation does not match the number of slides.');
+
 		this.notification = this.node.querySelector(this.settings.liveRegionSelector);
 		this.setCurrent(this.settings.startIndex);
 		this.slides[this.currentIndex].container.classList.add(this.settings.activeClass);

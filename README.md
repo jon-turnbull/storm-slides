@@ -4,7 +4,7 @@
 [![codecov.io](http://codecov.io/github/mjbp/storm-slides/coverage.svg?branch=master)](http://codecov.io/github/mjbp/storm-slides?branch=master)
 [![npm version](https://badge.fury.io/js/storm-slides.svg)](https://badge.fury.io/js/storm-slides)
 
-Accessible image lazyloading slides/carousel/fader component.
+Slides/carousel/fader/slider component. Accessible, lazy-loading image content, multi-panel content area with between-slide transitions.
 
 ## Example
 [https://mjbp.github.io/storm-slides](https://mjbp.github.io/storm-slides)
@@ -57,6 +57,73 @@ Load('{{path}}/storm-component-boilerplate.standalone.js')
     .then(() => {
         StormSlides.init('.js-slides');
     });
+```
+
+CSS
+Basic CSS to support fading transition
+```
+.visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+.js-slides {
+    position: relative;
+}
+.js-slides__list {
+    position: relative;
+    overflow: hidden;
+}
+.js-slides__item {
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+.js-slides__item.is--current {
+    visibility: visible;
+    position: relative;
+}
+.js-slides__item.hide--previous,
+.js-slides__item.hide--next {
+  visibility: visible;
+  z-index: 2;
+  -webkit-animation: fadeOut 450ms cubic-bezier(0.455, 0.03, 0.515, 0.955) both;
+  -moz-animation: fadeOut 450ms cubic-bezier(0.455, 0.03, 0.515, 0.955) both;
+  -ms-animation: fadeOut 450ms cubic-bezier(0.455, 0.03, 0.515, 0.955) both;
+  animation: fadeOut 450ms cubic-bezier(0.455, 0.03, 0.515, 0.955) both;
+}
+
+@-webkit-keyframes fadeOut {
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@-moz-keyframes fadeOut {
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@-ms-keyframes fadeOut {
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes fadeOut {
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
 ```
 
 ## Options

@@ -14,6 +14,9 @@ export default {
 		this.nextButton = document.querySelector(this.settings.buttonNextSelector);
 		this.previousButton = document.querySelector(this.settings.buttonPreviousSelector);
 		this.navItems = [].slice.call(document.querySelectorAll(this.settings.navItemSelector));
+
+		if(this.navItems.length > 0 && this.navItems.length !== this.slides.length) throw new Error('Slide navigation does not match the number of slides.');
+
 		this.notification = this.node.querySelector(this.settings.liveRegionSelector);
 		this.setCurrent(this.settings.startIndex);
 		this.slides[this.currentIndex].container.classList.add(this.settings.activeClass);
@@ -50,15 +53,15 @@ export default {
 
 			this.slides[idx].container.classList.add(this.settings.loadingClass);
 			this.slides[idx].unloadedImgs = this.slides[idx].unloadedImgs.reduce((acc, el) => {
-				['src', 'srcset'].forEach(type => {
-					if(el.hasAttribute(`data-${type}`)) {
-						el.setAttribute(type, el.getAttribute(`data-${type}`));
-						el.removeAttribute(`data-${type}`);
-					}
-					this.slides[idx].container.classList.remove(this.settings.loadingClass);
-				});
-				return acc;
-			}, []);
+												['src', 'srcset'].forEach(type => {
+													if(el.hasAttribute(`data-${type}`)) {
+														el.setAttribute(type, el.getAttribute(`data-${type}`));
+														el.removeAttribute(`data-${type}`);
+													}
+													this.slides[idx].container.classList.remove(this.settings.loadingClass);
+												});
+												return acc;
+											}, []);
 		});
 	},
 	reset(){
