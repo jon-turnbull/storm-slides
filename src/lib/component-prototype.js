@@ -41,6 +41,21 @@ export default {
 			});
 		});
 	},
+	loadImage(i){
+		if(!this.slides[i].unloadedImgs.length) return;
+		
+		this.slides[i].container.classList.add(this.settings.loadingClass);
+		this.slides[i].unloadedImgs = this.slides[i].unloadedImgs.reduce((acc, el) => {
+											['src', 'srcset'].forEach(type => {
+												if(el.hasAttribute(`data-${type}`)) {
+													el.setAttribute(type, el.getAttribute(`data-${type}`));
+													el.removeAttribute(`data-${type}`);
+												}
+												this.slides[i].container.classList.remove(this.settings.loadingClass);
+											});
+											return acc;
+										}, []);
+	},
 	loadImages(i){
 		if(!this.node.querySelector('[data-src], [data-srcset]')) return;
 		let indexes = [i];
@@ -48,21 +63,7 @@ export default {
 		if(this.slides.length > 1) indexes.push(i === 0 ? this.slides.length - 1 : i - 1);
 		if(this.slides.length > 2) indexes.push(i === this.slides.length - 1 ? 0 : i + 1);
 
-		indexes.forEach(idx => {
-			if(!this.slides[idx].unloadedImgs.length) return;
-
-			this.slides[idx].container.classList.add(this.settings.loadingClass);
-			this.slides[idx].unloadedImgs = this.slides[idx].unloadedImgs.reduce((acc, el) => {
-												['src', 'srcset'].forEach(type => {
-													if(el.hasAttribute(`data-${type}`)) {
-														el.setAttribute(type, el.getAttribute(`data-${type}`));
-														el.removeAttribute(`data-${type}`);
-													}
-													this.slides[idx].container.classList.remove(this.settings.loadingClass);
-												});
-												return acc;
-											}, []);
-		});
+		indexes.forEach(idx => { this.loadImage(idx) });
 	},
 	reset(){
 		this.slides[this.currentIndex].container.classList.remove(this.settings.activeClass);
@@ -89,9 +90,11 @@ export default {
 		if (index === this.currentIndex) return;
 		
 		this.reset();
-		this.loadImages(index);
 
 		index = index === -1 ? this.slides.length - 1 : index === this.slides.length ? 0 : index;
+
+		this.loadImages(index);
+		
 		let isForwards = (index > this.currentIndex || index === 0 && this.currentIndex === this.slides.length - 1) && !(index === (this.slides.length - 1) && this.currentIndex === 0);
 		
 		this.slides[this.currentIndex].container.classList.add(isForwards ? this.settings.hidePreviousClass : this.settings.hideNextClass);

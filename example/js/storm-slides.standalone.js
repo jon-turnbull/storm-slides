@@ -1,6 +1,6 @@
 /**
  * @name storm-slides: Slides/carousel/fader/slider component
- * @version 0.1.0: Tue, 17 Oct 2017 12:40:44 GMT
+ * @version 0.1.0: Thu, 19 Oct 2017 16:25:42 GMT
  * @author stormid
  * @license MIT
  */
@@ -14,7 +14,7 @@
        module.exports = mod.exports.default
    } else {
        factory(mod.exports);
-       root.gulpWrapUmd = mod.exports.default
+       root.StormSlides = mod.exports.default
    }
 
 }(this, function(exports) {
@@ -90,8 +90,25 @@ var componentPrototype = {
 			});
 		});
 	},
-	loadImages: function loadImages(i) {
+	loadImage: function loadImage(i) {
 		var _this3 = this;
+
+		if (!this.slides[i].unloadedImgs.length) return;
+
+		this.slides[i].container.classList.add(this.settings.loadingClass);
+		this.slides[i].unloadedImgs = this.slides[i].unloadedImgs.reduce(function (acc, el) {
+			['src', 'srcset'].forEach(function (type) {
+				if (el.hasAttribute('data-' + type)) {
+					el.setAttribute(type, el.getAttribute('data-' + type));
+					el.removeAttribute('data-' + type);
+				}
+				_this3.slides[i].container.classList.remove(_this3.settings.loadingClass);
+			});
+			return acc;
+		}, []);
+	},
+	loadImages: function loadImages(i) {
+		var _this4 = this;
 
 		if (!this.node.querySelector('[data-src], [data-srcset]')) return;
 		var indexes = [i];
@@ -100,19 +117,7 @@ var componentPrototype = {
 		if (this.slides.length > 2) indexes.push(i === this.slides.length - 1 ? 0 : i + 1);
 
 		indexes.forEach(function (idx) {
-			if (!_this3.slides[idx].unloadedImgs.length) return;
-
-			_this3.slides[idx].container.classList.add(_this3.settings.loadingClass);
-			_this3.slides[idx].unloadedImgs = _this3.slides[idx].unloadedImgs.reduce(function (acc, el) {
-				['src', 'srcset'].forEach(function (type) {
-					if (el.hasAttribute('data-' + type)) {
-						el.setAttribute(type, el.getAttribute('data-' + type));
-						el.removeAttribute('data-' + type);
-					}
-					_this3.slides[idx].container.classList.remove(_this3.settings.loadingClass);
-				});
-				return acc;
-			}, []);
+			_this4.loadImage(idx);
 		});
 	},
 	reset: function reset() {
@@ -140,9 +145,11 @@ var componentPrototype = {
 		if (index === this.currentIndex) return;
 
 		this.reset();
-		this.loadImages(index);
 
 		index = index === -1 ? this.slides.length - 1 : index === this.slides.length ? 0 : index;
+
+		this.loadImages(index);
+
 		var isForwards = (index > this.currentIndex || index === 0 && this.currentIndex === this.slides.length - 1) && !(index === this.slides.length - 1 && this.currentIndex === 0);
 
 		this.slides[this.currentIndex].container.classList.add(isForwards ? this.settings.hidePreviousClass : this.settings.hideNextClass);
@@ -165,7 +172,7 @@ var init = function init(sel, opts) {
 	var els = [].slice.call(document.querySelectorAll(sel));
 	//let els = Array.from(document.querySelectorAll(sel));
 
-	if (!els.length) return console.warn('Slides not initialised, no augmentable elements found');
+	if (!els.length) throw new Error('Slides not initialised, no augmentable elements found');
 
 	return els.map(function (el) {
 		return Object.assign(Object.create(componentPrototype), {

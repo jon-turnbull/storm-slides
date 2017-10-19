@@ -85,7 +85,7 @@ gulp.task('js:es5-rollup', function() {
 	return gulp.src('src/index.js')
         .pipe(rollup({
 			allowRealFiles: true,
-            entry: 'src/index.js',
+            input: 'src/index.js',
 			format: 'es',
 			plugins: [
 				rollupNodeResolve(),
@@ -96,6 +96,7 @@ gulp.task('js:es5-rollup', function() {
 			presets: ['es2015']
 		}))
         .pipe(wrap({
+            namespace: componentName(),
             template: umdTemplate
         }))
         .pipe(header(banner, {pkg : pkg}))

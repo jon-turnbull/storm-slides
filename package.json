@@ -26,6 +26,7 @@
     "serve": "node_modules/.bin/gulp server",
     "start": "node_modules/.bin/gulp server",
     "test": "istanbul cover _mocha --report lcovonly -- -R spec && codecov",
+    "test:local": "istanbul cover _mocha",
     "test:watch": "NODE_ENV=test mocha --watch"
   },
   "browserify": {
