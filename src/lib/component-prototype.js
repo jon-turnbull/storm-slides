@@ -112,7 +112,7 @@ export default {
 		this.currentIndex = i;
     },
     autoPlay(slideDuration) {
-        setInterval(() => {
+        this.interval = setInterval(() => {
             this.next();
         }, slideDuration ? slideDuration * 1000 : 5000);
     }
