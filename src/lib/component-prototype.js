@@ -22,7 +22,7 @@ export default {
 		this.slides[this.currentIndex].container.classList.add(this.settings.activeClass);
 		this.initHandlers();
 		this.settings.preload ? this.slides.forEach((slide, i) => { this.loadImage(i); }) : this.loadImages(this.settings.startIndex);
-        this.settings.autoPlay ? this.autoPlay(this.settings.slideDuration, this.next) : null;
+        this.settings.autoPlay ? this.autoPlay(this.settings.slideDuration) : null;
 		return this;
 	},
 	initHandlers(){

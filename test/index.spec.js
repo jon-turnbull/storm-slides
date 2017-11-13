@@ -99,7 +99,7 @@ describe('Initialisation', () => {
     });
 
     it('should create an interval when enabling autoplay', () => {
-        SlidesAutoplay[0].should.have.property('interval').which.is.a.Number();
+        SlidesAutoplay.should.have.property('interval').which.is.a.Number();
     });
 });
 

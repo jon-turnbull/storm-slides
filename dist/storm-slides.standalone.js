@@ -1,6 +1,6 @@
 /**
  * @name storm-slides: Slides/carousel/fader/slider component
- * @version 0.2.0: Mon, 13 Nov 2017 12:09:57 GMT
+ * @version 0.2.0: Mon, 13 Nov 2017 12:45:14 GMT
  * @author stormid
  * @license MIT
  */
@@ -169,7 +169,7 @@ var componentPrototype = {
 	autoPlay: function autoPlay(slideDuration) {
 		var _this5 = this;
 
-		setInterval(function () {
+		this.interval = setInterval(function () {
 			_this5.next();
 		}, slideDuration ? slideDuration * 1000 : 5000);
 	}
