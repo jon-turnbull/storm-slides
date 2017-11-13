@@ -22,7 +22,7 @@ export default {
 		this.slides[this.currentIndex].container.classList.add(this.settings.activeClass);
 		this.initHandlers();
 		this.settings.preload ? this.slides.forEach((slide, i) => { this.loadImage(i); }) : this.loadImages(this.settings.startIndex);
-
+        this.settings.autoPlay ? this.autoPlay(this.settings.slideDuration, this.next) : null;
 		return this;
 	},
 	initHandlers(){
@@ -110,5 +110,10 @@ export default {
 		this.navItems.length && this.navItems[i].setAttribute('aria-current', true);
 		this.notification.innerHTML = `Slide ${i + 1} of ${this.slides.length}`;
 		this.currentIndex = i;
-	}
+    },
+    autoPlay(slideDuration) {
+        setInterval(() => {
+            this.next();
+        }, slideDuration ? slideDuration * 1000 : 5000);
+    }
 };

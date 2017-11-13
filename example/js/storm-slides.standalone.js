@@ -1,6 +1,6 @@
 /**
  * @name storm-slides: Slides/carousel/fader/slider component
- * @version 0.2.0: Mon, 13 Nov 2017 11:16:48 GMT
+ * @version 0.2.0: Mon, 13 Nov 2017 11:49:46 GMT
  * @author stormid
  * @license MIT
  */
@@ -69,7 +69,7 @@ var componentPrototype = {
 		this.settings.preload ? this.slides.forEach(function (slide, i) {
 			_this.loadImage(i);
 		}) : this.loadImages(this.settings.startIndex);
-
+		this.settings.autoPlay ? this.autoPlay(this.settings.slideDuration, this.next) : null;
 		return this;
 	},
 	initHandlers: function initHandlers() {
@@ -165,6 +165,13 @@ var componentPrototype = {
 		this.navItems.length && this.navItems[i].setAttribute('aria-current', true);
 		this.notification.innerHTML = 'Slide ' + (i + 1) + ' of ' + this.slides.length;
 		this.currentIndex = i;
+	},
+	autoPlay: function autoPlay(slideDuration) {
+		var _this5 = this;
+
+		setInterval(function () {
+			_this5.next();
+		}, slideDuration ? slideDuration * 1000 : 5000);
 	}
 };
 
