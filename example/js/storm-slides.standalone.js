@@ -1,6 +1,6 @@
 /**
  * @name storm-slides: Slides/carousel/fader/slider component
- * @version 0.2.0: Fri, 27 Oct 2017 11:54:19 GMT
+ * @version 0.2.0: Mon, 13 Nov 2017 11:16:48 GMT
  * @author stormid
  * @license MIT
  */
@@ -49,16 +49,16 @@ var componentPrototype = {
 	init: function init() {
 		var _this = this;
 
-		this.slides = [].slice.call(document.querySelectorAll(this.settings.itemSelector)).map(function (slide) {
+		this.slides = [].slice.call(this.node.querySelectorAll(this.settings.itemSelector)).map(function (slide) {
 			return {
 				unloadedImgs: [].slice.call(slide.querySelectorAll('[data-srcset], [data-src]')),
 				container: slide
 			};
 		});
 
-		this.nextButton = document.querySelector(this.settings.buttonNextSelector);
-		this.previousButton = document.querySelector(this.settings.buttonPreviousSelector);
-		this.navItems = [].slice.call(document.querySelectorAll(this.settings.navItemSelector));
+		this.nextButton = this.node.querySelector(this.settings.buttonNextSelector);
+		this.previousButton = this.node.querySelector(this.settings.buttonPreviousSelector);
+		this.navItems = [].slice.call(this.node.querySelectorAll(this.settings.navItemSelector));
 
 		if (this.navItems.length > 0 && this.navItems.length !== this.slides.length) throw new Error('Slide navigation does not match the number of slides.');
 

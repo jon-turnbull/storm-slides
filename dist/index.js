@@ -1,6 +1,6 @@
 /**
  * @name storm-slides: Slides/carousel/fader/slider component
- * @version 0.2.0: Fri, 27 Oct 2017 11:54:19 GMT
+ * @version 0.2.0: Mon, 13 Nov 2017 11:16:47 GMT
  * @author stormid
  * @license MIT
  */
